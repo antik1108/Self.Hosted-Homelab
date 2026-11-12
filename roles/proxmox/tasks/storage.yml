@@ -1,0 +1,15 @@
+---
+- name: Configure storage
+  community.general.proxmox_storage:
+    api_user: "root@pam"
+    api_password: "{{ vault_proxmox_password }}"
+    api_host: "{{ proxmox.management_ip }}"
+    node: "{{ proxmox.hostname }}"
+    storage: "{{ item.key }}"
+    type: "{{ item.value.type }}"
+    content: "{{ item.value.content | default('images') }}"
+    vgname: "{{ item.value.vgname | default(omit) }}"
+    path: "{{ item.value.path | default(omit) }}"
+    shared: "{{ item.value.shared | default(false) }}"
+  loop: "{{ storage | dict2items }}"
+  when: vault_proxmox_password is defined

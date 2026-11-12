@@ -1,0 +1,37 @@
+---
+- name: Configure dnsmasq DNS settings
+  openwrt.uci:
+    config: dhcp
+    section: dnsmasq
+    type: dnsmasq
+    values:
+      domainneeded: "1"
+      localise_queries: "1"
+      rebind_protection: "{{ dns.rebind_protection | lower }}"
+      rebind_localhost: "{{ dns.localhost_only | lower }}"
+      local: "/lan/"
+      domain: "lan"
+      expandhosts: "1"
+      authoritative: "1"
+      readethers: "1"
+      leasefile: "/tmp/dhcp.leases"
+      resolvfile: "/tmp/resolv.conf.auto"
+      localservice: "1"
+      ednspacket_max: "1232"
+      dnssec: "1"
+      dnsseccheckunsigned: "1"
+      cachesize: "1000"
+      noresolv: "1"
+      server: "{{ dns.servers }}"
+  notify: reload dnsmasq
+
+- name: Add local DNS entries for infrastructure
+  openwrt.uci:
+    config: dhcp
+    section: "{{ item.name }}"
+    type: domain
+    values:
+      name: "{{ item.name }}.lan"
+      ip: "{{ item.ip }}"
+  loop: "{{ dhcp_static_reservations }}"
+  notify: reload dnsmasq

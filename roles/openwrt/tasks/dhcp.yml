@@ -1,0 +1,41 @@
+---
+- name: Configure DHCP server for LAN
+  openwrt.uci:
+    config: dhcp
+    section: lan
+    type: dhcp
+    values:
+      interface: "lan"
+      start: "{{ dhcp.start }}"
+      limit: "{{ dhcp.limit }}"
+      leasetime: "{{ dhcp.leasetime }}"
+      dhcpv4: "server"
+      dhcpv6: "server"
+      ra: "server"
+      ra_slaac: "1"
+      ra_flags: "managed-config,other-config"
+  notify: reload dnsmasq
+
+- name: Configure DHCP static reservations
+  openwrt.uci:
+    config: dhcp
+    section: "{{ item.name }}"
+    type: host
+    values:
+      mac: "{{ item.mac }}"
+      ip: "{{ item.ip }}"
+      name: "{{ item.name }}"
+  loop: "{{ dhcp_static_reservations }}"
+  loop_control:
+    label: "{{ item.name }} ({{ item.mac }})"
+  notify: reload dnsmasq
+
+- name: Disable DHCP on WAN (security)
+  openwrt.uci:
+    config: dhcp
+    section: wan
+    type: dhcp
+    values:
+      interface: "wan"
+      ignore: "1"
+  notify: reload dnsmasq

@@ -1,0 +1,21 @@
+---
+# Proxmox role main tasks file
+- name: Include network tasks
+  include_tasks: network.yml
+  tags: [network, bridges, interfaces]
+
+- name: Include storage tasks
+  include_tasks: storage.yml
+  tags: [storage]
+
+- name: Include node tasks
+  include_tasks: node.yml
+  tags: [node, subscription, email]
+
+- name: Include VM defaults tasks
+  include_tasks: vm_defaults.yml
+  tags: [vm, ct, templates]
+
+- name: Include backup tasks
+  include_tasks: backup.yml
+  tags: [backup, vzdump]

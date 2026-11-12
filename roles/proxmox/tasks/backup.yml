@@ -1,0 +1,30 @@
+---
+- name: Configure vzdump backup
+  ansible.builtin.copy:
+    dest: "/etc/vzdump.conf"
+    content: |
+      # vzdump configuration
+      storage: {{ backup.storage }}
+      mode: {{ backup.mode }}
+      compress: {{ backup.compression }}
+      # schedule: {{ backup.schedule }}
+      # maxfiles: {{ backup.retention }}
+      tmpdir: /var/tmp
+      bwlimit: 0
+      ionice: 7
+      lockwait: 180
+      mailto: {{ node.email }}
+      mailnotification: failure
+    mode: "0644"
+
+- name: Create backup cron job (optional)
+  ansible.builtin.cron:
+    name: "Proxmox VM/CT backup"
+    minute: "{{ backup.schedule.split(' ')[0] }}"
+    hour: "{{ backup.schedule.split(' ')[1] }}"
+    day: "{{ backup.schedule.split(' ')[2] }}"
+    month: "{{ backup.schedule.split(' ')[3] }}"
+    weekday: "{{ backup.schedule.split(' ')[4] }}"
+    job: "vzdump --all --storage {{ backup.storage }} --mode {{ backup.mode }} --compress {{ backup.compression }} --mailto {{ node.email }}"
+    user: root
+  when: backup.schedule is defined

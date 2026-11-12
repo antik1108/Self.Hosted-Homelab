@@ -1,0 +1,53 @@
+---
+- name: Commit UCI changes
+  openwrt.uci:
+    config: "*"
+    state: commit
+  register: uci_commit
+
+- name: Reload network if needed
+  openwrt.uci:
+    config: network
+    state: reload
+  when: uci_commit.changed
+  notify: reload network
+
+- name: Reload wireless if needed
+  openwrt.uci:
+    config: wireless
+    state: reload
+  when: uci_commit.changed
+  notify: reload wireless
+
+- name: Reload firewall if needed
+  openwrt.uci:
+    config: firewall
+    state: reload
+  when: uci_commit.changed
+  notify: reload firewall
+
+- name: Reload dnsmasq if needed
+  openwrt.uci:
+    config: dhcp
+    state: reload
+  when: uci_commit.changed
+  notify: reload dnsmasq
+
+- name: Reload dropbear if needed
+  openwrt.uci:
+    config: dropbear
+    state: reload
+  when: uci_commit.changed
+  notify: reload dropbear
+
+- name: Verify configuration after commit
+  openwrt.uci:
+    config: "*"
+    state: list
+  register: verify_config
+  changed_when: false
+
+- name: Display verification
+  ansible.builtin.debug:
+    msg: "OpenWrt configuration committed and verified"
+  delegate_to: localhost

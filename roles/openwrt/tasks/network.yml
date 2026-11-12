@@ -1,0 +1,47 @@
+---
+- name: Configure LAN interface
+  openwrt.uci:
+    config: network
+    section: lan
+    type: interface
+    values:
+      type: "{{ lan.type }}"
+      proto: "{{ lan.proto }}"
+      ipaddr: "{{ lan.ipaddr }}"
+      netmask: "{{ lan.netmask }}"
+      ip6assign: "{{ lan.ip6assign }}"
+      hostname: "{{ router.hostname }}"
+  notify: reload network
+
+- name: Configure WAN interface
+  openwrt.uci:
+    config: network
+    section: wan
+    type: interface
+    values:
+      proto: "{{ wan.proto }}"
+      hostname: "{{ router.hostname }}"
+      # PPPoE settings (uncomment if needed)
+      # username: "{{ wan.username | default(omit) }}"
+      # password: "{{ wan.password | default(omit) }}"
+  notify: reload network
+
+- name: Configure WAN6 interface (IPv6)
+  openwrt.uci:
+    config: network
+    section: wan6
+    type: interface
+    values:
+      proto: "dhcpv6"
+      ifname: "@wan"
+      reqaddress: "try"
+      reqprefix: "auto"
+  notify: reload network
+
+- name: Ensure LAN bridge includes correct ports
+  openwrt.uci:
+    config: network
+    section: lan
+    values:
+      ifname: "eth0"
+  notify: reload network

@@ -1,0 +1,64 @@
+---
+# Proxmox-specific variables (hardware-specific settings)
+proxmox:
+  hostname: "pve-host"
+  management_ip: "192.168.1.10"
+  management_interface: "vmbr0"
+  gateway: "{{ network.lan_gateway }}"
+  dns_servers: "{{ network.dns_servers }}"
+
+# Network bridges (adjust based on actual hardware)
+bridges:
+  vmbr0:
+    name: "vmbr0"
+    type: "static"
+    ip: "192.168.1.10/24"
+    gateway: "{{ network.lan_gateway }}"
+    bridge_ports: "eno1"
+    bridge_stp: "off"
+    bridge_fd: "0"
+    comment: "Management bridge - LAN"
+  # vmbr1:
+  #   name: "vmbr1"
+  #   type: "manual"
+  #   bridge_ports: "eno2"
+  #   bridge_stp: "off"
+  #   bridge_fd: "0"
+  #   comment: "VM bridge - isolated"
+
+# Storage configuration
+storage:
+  local-lvm:
+    type: "lvmthin"
+    vgname: "pve"
+    content: "rootdir,images"
+  local:
+    type: "dir"
+    path: "/var/lib/vz"
+    content: "vztmpl,iso,backup"
+    shared: false
+
+# VM/CT defaults
+vm_defaults:
+  memory: 2048
+  cores: 2
+  cpu: "host"
+  net0: "virtio,bridge=vmbr0"
+  scsihw: "virtio-scsi-pci"
+  scsi0: "local-lvm:32"
+  ostype: "l26"
+  onboot: true
+  agent: "1,fstrim_cloned_disks=1"
+
+# Node settings
+node:
+  email: "admin@example.com"
+  # subscription_key: "{{ vault_proxmox_subscription }}"  # Optional
+
+# Backup settings
+backup:
+  storage: "local"
+  mode: "snapshot"
+  compression: "zstd"
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: 7

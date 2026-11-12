@@ -1,0 +1,26 @@
+---
+- name: Set node email for notifications
+  ansible.builtin.lineinfile:
+    path: "/etc/pve/nodes/{{ proxmox.hostname }}/pve-ssl.cfg"
+    line: "email: {{ node.email }}"
+    create: true
+  when: node.email is defined
+
+- name: Configure subscription (if key provided)
+  ansible.builtin.command: "pvesubscription set {{ node.subscription_key }}"
+  when: node.subscription_key is defined
+  ignore_errors: true
+  changed_when: false
+
+- name: Configure apt sources for no-subscription repo
+  ansible.builtin.copy:
+    dest: "/etc/apt/sources.list.d/pve-no-subscription.list"
+    content: |
+      deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription
+    mode: "0644"
+  notify: update apt
+
+- name: Disable enterprise repository
+  ansible.builtin.file:
+    path: "/etc/apt/sources.list.d/pve-enterprise.list"
+    state: absent

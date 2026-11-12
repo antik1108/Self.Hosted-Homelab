@@ -1,0 +1,51 @@
+---
+- name: Enable and start essential services
+  openwrt.uci:
+    config: system
+    section: "{{ item }}"
+    type: service
+    values:
+      enabled: "1"
+      trigger: "wan"
+  loop:
+    - "firewall"
+    - "dnsmasq"
+    - "dropbear"
+    - "ntpd"
+    - "syslog"
+  notify: reload system
+
+- name: Configure syslog remote logging (optional)
+  openwrt.uci:
+    config: system
+    section: log_remote
+    type: log_remote
+    values:
+      enabled: "0"
+      # host: "192.168.1.100"
+      # port: "514"
+  notify: reload system
+
+- name: Configure LED triggers (optional)
+  openwrt.uci:
+    config: system
+    section: led_wan
+    type: led
+    values:
+      name: "WAN"
+      sysfs: "tp-link:green:wan"
+      trigger: "netdev"
+      dev: "wan"
+      mode: "link tx rx"
+  notify: reload system
+
+- name: Configure LED for WiFi
+  openwrt.uci:
+    config: system
+    section: led_wifi
+    type: led
+    values:
+      name: "WiFi"
+      sysfs: "tp-link:green:wlan"
+      trigger: "phy0tpt"
+  notify: reload system

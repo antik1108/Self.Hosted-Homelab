@@ -1,0 +1,95 @@
+---
+- name: Backup OpenWrt Configuration
+  hosts: openwrt
+  gather_facts: false
+  collections:
+    - community.openwrt
+  vars:
+    backup_dir: "{{ playbook_dir }}/../backups/openwrt/{{ ansible_date_time.date }}"
+  tasks:
+    - name: Create backup directory
+      ansible.builtin.file:
+        path: "{{ backup_dir }}"
+        state: directory
+        mode: "0700"
+      delegate_to: localhost
+
+    - name: Backup UCI configuration
+      openwrt.uci:
+        config: "{{ item }}"
+        state: list
+      register: uci_backup
+      loop:
+        - network
+        - wireless
+        - dhcp
+        - firewall
+        - system
+        - dropbear
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Save UCI backup to files
+      ansible.builtin.copy:
+        content: "{{ item.stdout }}"
+        dest: "{{ backup_dir }}/{{ item.item }}.conf"
+        mode: "0600"
+      loop: "{{ uci_backup.results }}"
+      delegate_to: localhost
+
+    - name: Create full sysupgrade backup
+      ansible.builtin.command: "sysupgrade -b /tmp/openwrt-backup-{{ ansible_date_time.iso8601 }}.tar.gz"
+      delegate_to: "{{ inventory_hostname }}"
+      register: sysupgrade_backup
+      changed_when: false
+
+    - name: Fetch sysupgrade backup
+      ansible.builtin.fetch:
+        src: "{{ sysupgrade_backup.stdout | regex_search('/tmp/openwrt-backup-[^ ]+\\.tar\\.gz') }}"
+        dest: "{{ backup_dir }}/"
+        flat: yes
+      delegate_to: localhost
+
+    - name: Display backup location
+      ansible.builtin.debug:
+        msg: "OpenWrt backup saved to {{ backup_dir }}"
+      delegate_to: localhost
+
+- name: Backup Proxmox Configuration
+  hosts: proxmox
+  gather_facts: false
+  become: true
+  vars:
+    backup_dir: "{{ playbook_dir }}/../backups/proxmox/{{ ansible_date_time.date }}"
+  tasks:
+    - name: Create backup directory
+      ansible.builtin.file:
+        path: "{{ backup_dir }}"
+        state: directory
+        mode: "0700"
+      delegate_to: localhost
+
+    - name: Backup network interfaces
+      ansible.builtin.copy:
+        src: "/etc/network/interfaces"
+        dest: "{{ backup_dir }}/interfaces"
+        mode: "0600"
+      delegate_to: localhost
+
+    - name: Backup PVE cluster config
+      ansible.builtin.copy:
+        src: "/etc/pve/"
+        dest: "{{ backup_dir }}/pve/"
+        mode: "0600"
+      delegate_to: localhost
+
+    - name: Backup storage config
+      ansible.builtin.copy:
+        src: "/etc/pve/storage.cfg"
+        dest: "{{ backup_dir }}/storage.cfg"
+        mode: "0600"
+      delegate_to: localhost
+
+    - name: Display backup location
+      ansible.builtin.debug:
+        msg: "Proxmox backup saved to {{ backup_dir }}"
+      delegate_to: localhost

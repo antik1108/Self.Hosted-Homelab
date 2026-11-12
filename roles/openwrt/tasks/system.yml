@@ -1,0 +1,32 @@
+---
+- name: Set router hostname
+  openwrt.uci:
+    config: system
+    section: "{{ router.hostname }}"
+    type: system
+    values:
+      hostname: "{{ router.hostname }}"
+      zonename: "{{ timezone }}"
+      time_zone: "{{ timezone }}"
+  notify: reload system
+
+- name: Configure NTP servers
+  openwrt.uci:
+    config: system
+    section: ntp
+    type: timeserver
+    values:
+      server: "{{ ntp_servers }}"
+      enabled: "1"
+  notify: reload system
+
+- name: Configure system logging
+  openwrt.uci:
+    config: system
+    section: log
+    values:
+      log_file: "/var/log/messages"
+      log_size: "100"
+      log_type: "file"
+      log_level: "3"
+  notify: reload system

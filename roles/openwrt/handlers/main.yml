@@ -1,0 +1,30 @@
+---
+- name: reload system
+  ansible.builtin.command: "/etc/init.d/system reload"
+  delegate_to: "{{ inventory_hostname }}"
+  changed_when: false
+
+- name: reload network
+  ansible.builtin.command: "/etc/init.d/network reload"
+  delegate_to: "{{ inventory_hostname }}"
+  changed_when: false
+
+- name: reload wireless
+  ansible.builtin.command: "wifi reload"
+  delegate_to: "{{ inventory_hostname }}"
+  changed_when: false
+
+- name: reload firewall
+  ansible.builtin.command: "/etc/init.d/firewall reload"
+  delegate_to: "{{ inventory_hostname }}"
+  changed_when: false
+
+- name: reload dnsmasq
+  ansible.builtin.command: "/etc/init.d/dnsmasq reload"
+  delegate_to: "{{ inventory_hostname }}"
+  changed_when: false
+
+- name: reload dropbear
+  ansible.builtin.command: "/etc/init.d/dropbear reload"
+  delegate_to: "{{ inventory_hostname }}"
+  changed_when: false

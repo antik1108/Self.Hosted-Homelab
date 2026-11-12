@@ -1,0 +1,11 @@
+collections:
+  - name: community.openwrt
+    version: ">=1.11.0"
+  - name: community.general
+    version: ">=8.0.0"
+  - name: ansible.utils
+    version: ">=2.10.0"
+  - name: community.docker
+    version: ">=3.6.0"
+
+roles: []

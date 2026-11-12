@@ -1,0 +1,22 @@
+---
+- name: Configure OpenWrt Router
+  hosts: openwrt
+  gather_facts: false
+  collections:
+    - community.openwrt
+  vars_files:
+    - ../inventory/group_vars/all.yml
+    - ../inventory/group_vars/openwrt.yml
+  pre_tasks:
+    - name: Verify connectivity to router
+      ansible.builtin.ping:
+      delegate_to: "{{ inventory_hostname }}"
+  roles:
+    - role: openwrt
+  tags:
+    - openwrt
+    - network
+    - firewall
+    - dhcp
+    - dns
+    - wifi

@@ -1,0 +1,32 @@
+---
+- name: Configure Dropbear SSH server
+  openwrt.uci:
+    config: dropbear
+    section: main
+    type: dropbear
+    values:
+      Port: "{{ ssh.port }}"
+      PasswordAuth: "{{ ssh.password_authentication | lower }}"
+      RootPasswordAuth: "{{ ssh.permit_root_login }}"
+      RootLogin: "{{ ssh.permit_root_login }}"
+      GatewayPorts: "0"
+      BannerFile: "/etc/banner"
+  notify: reload dropbear
+
+- name: Ensure SSH key authentication is enabled
+  openwrt.uci:
+    config: dropbear
+    section: main
+    values:
+      RSAAuth: "{{ ssh.pubkey_authentication | lower }}"
+      PubkeyAuth: "{{ ssh.pubkey_authentication | lower }}"
+  notify: reload dropbear
+
+- name: Set authorized keys for root
+  ansible.builtin.authorized_key:
+    user: root
+    state: present
+    key: "{{ vault_ssh_public_key }}"
+    key_options: "no-agent-forwarding,no-port-forwarding,no-X11-forwarding"
+  delegate_to: "{{ inventory_hostname }}"
+  when: vault_ssh_public_key is defined

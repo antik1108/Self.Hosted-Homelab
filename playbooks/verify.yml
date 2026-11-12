@@ -1,0 +1,137 @@
+---
+- name: Verify OpenWrt Network Connectivity
+  hosts: openwrt
+  gather_facts: false
+  collections:
+    - community.openwrt
+  tasks:
+    - name: Check router reachability
+      ansible.builtin.ping:
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Verify LAN interface configuration
+      openwrt.uci:
+        config: network
+        section: lan
+        state: list
+      register: lan_config
+
+    - name: Display LAN config
+      ansible.builtin.debug:
+        var: lan_config.stdout
+      delegate_to: localhost
+
+    - name: Verify WAN interface configuration
+      openwrt.uci:
+        config: network
+        section: wan
+        state: list
+      register: wan_config
+
+    - name: Display WAN config
+      ansible.builtin.debug:
+        var: wan_config.stdout
+      delegate_to: localhost
+
+    - name: Verify DHCP configuration
+      openwrt.uci:
+        config: dhcp
+        section: lan
+        state: list
+      register: dhcp_config
+
+    - name: Display DHCP config
+      ansible.builtin.debug:
+        var: dhcp_config.stdout
+      delegate_to: localhost
+
+    - name: Verify firewall zones
+      openwrt.uci:
+        config: firewall
+        state: list
+      register: firewall_config
+
+    - name: Display firewall config
+      ansible.builtin.debug:
+        var: firewall_config.stdout
+      delegate_to: localhost
+
+    - name: Verify wireless configuration
+      openwrt.uci:
+        config: wireless
+        state: list
+      register: wifi_config
+
+    - name: Display wireless config
+      ansible.builtin.debug:
+        var: wifi_config.stdout
+      delegate_to: localhost
+
+    - name: Test internet connectivity
+      ansible.builtin.command: "ping -c 3 1.1.1.1"
+      delegate_to: "{{ inventory_hostname }}"
+      register: ping_test
+      ignore_errors: true
+
+    - name: Display ping result
+      ansible.builtin.debug:
+        var: ping_test.stdout
+      delegate_to: localhost
+
+- name: Verify Proxmox Host
+  hosts: proxmox
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Check Proxmox reachability
+      ansible.builtin.ping:
+
+    - name: Verify network interfaces
+      ansible.builtin.command: "cat /etc/network/interfaces"
+      register: interfaces_config
+      changed_when: false
+
+    - name: Display interfaces config
+      ansible.builtin.debug:
+        var: interfaces_config.stdout
+      delegate_to: localhost
+
+    - name: Verify bridge configuration
+      ansible.builtin.command: "brctl show"
+      register: bridge_config
+      changed_when: false
+
+    - name: Display bridge config
+      ansible.builtin.debug:
+        var: bridge_config.stdout
+      delegate_to: localhost
+
+    - name: Check PVE version
+      ansible.builtin.command: "pveversion -v"
+      register: pve_version
+      changed_when: false
+
+    - name: Display PVE version
+      ansible.builtin.debug:
+        var: pve_version.stdout
+      delegate_to: localhost
+
+    - name: Check storage status
+      ansible.builtin.command: "pvesm status"
+      register: storage_status
+      changed_when: false
+
+    - name: Display storage status
+      ansible.builtin.debug:
+        var: storage_status.stdout
+      delegate_to: localhost
+
+    - name: Test gateway connectivity
+      ansible.builtin.command: "ping -c 3 {{ gateway }}"
+      register: gateway_ping
+      ignore_errors: true
+
+    - name: Display gateway ping result
+      ansible.builtin.debug:
+        var: gateway_ping.stdout
+      delegate_to: localhost

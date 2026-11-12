@@ -1,0 +1,8 @@
+---
+- name: reload networking
+  ansible.builtin.command: "systemctl reload networking"
+  changed_when: false
+
+- name: update apt
+  ansible.builtin.command: "apt-get update"
+  changed_when: false

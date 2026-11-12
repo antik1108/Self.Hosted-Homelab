@@ -1,0 +1,22 @@
+# Proxmox Network Configuration
+# Managed by Ansible - Do not edit manually
+# Generated: {{ ansible_date_time.iso8601 }}
+
+auto lo
+iface lo inet loopback
+
+{% for bridge_name, bridge_config in bridges.items() %}
+auto {{ bridge_config.name }}
+iface {{ bridge_config.name }} inet {{ bridge_config.type }}
+{% if bridge_config.type == 'static' %}
+    address {{ bridge_config.ip }}
+    gateway {{ bridge_config.gateway }}
+{% endif %}
+    bridge-ports {{ bridge_config.bridge_ports }}
+    bridge-stp {{ bridge_config.bridge_stp }}
+    bridge-fd {{ bridge_config.bridge_fd }}
+{% if bridge_config.comment is defined %}
+    # {{ bridge_config.comment }}
+{% endif %}
+
+{% endfor %}

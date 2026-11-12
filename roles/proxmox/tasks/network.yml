@@ -1,0 +1,22 @@
+---
+- name: Backup original interfaces file
+  ansible.builtin.copy:
+    src: "/etc/network/interfaces"
+    dest: "/etc/network/interfaces.backup-{{ ansible_date_time.iso8601 }}"
+    remote_src: true
+    mode: "0644"
+  changed_when: false
+
+- name: Configure network interfaces
+  ansible.builtin.template:
+    src: interfaces.j2
+    dest: "/etc/network/interfaces"
+    mode: "0644"
+    backup: true
+  notify: reload networking
+
+- name: Apply network configuration
+  ansible.builtin.command: "systemctl reload networking"
+  register: network_reload
+  changed_when: network_reload.rc == 0
+  ignore_errors: true

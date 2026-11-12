@@ -1,0 +1,61 @@
+---
+- name: Configure 2.4GHz radio (radio0)
+  openwrt.uci:
+    config: wireless
+    section: radio0
+    type: wifi-device
+    values:
+      disabled: "{{ wifi.radio0.disabled }}"
+      country: "{{ wifi.radio0.country }}"
+      channel: "{{ wifi.radio0.channel }}"
+      htmode: "{{ wifi.radio0.htmode }}"
+      legacy_rates: "1"
+      cell_density: "0"
+  notify: reload wireless
+
+- name: Configure 2.4GHz SSID
+  openwrt.uci:
+    config: wireless
+    section: default_radio0
+    type: wifi-iface
+    values:
+      device: "radio0"
+      network: "lan"
+      mode: "ap"
+      ssid: "{{ wifi.radio0.ssid }}"
+      encryption: "{{ wifi.radio0.encryption }}"
+      key: "{{ wifi.radio0.key }}"
+      isolate: "0"
+      wmm: "1"
+  notify: reload wireless
+
+- name: Configure 5GHz radio (radio1)
+  openwrt.uci:
+    config: wireless
+    section: radio1
+    type: wifi-device
+    values:
+      disabled: "{{ wifi.radio1.disabled }}"
+      country: "{{ wifi.radio1.country }}"
+      channel: "{{ wifi.radio1.channel }}"
+      htmode: "{{ wifi.radio1.htmode }}"
+      legacy_rates: "1"
+      cell_density: "0"
+  notify: reload wireless
+
+- name: Configure 5GHz SSID
+  openwrt.uci:
+    config: wireless
+    section: default_radio1
+    type: wifi-iface
+    values:
+      device: "radio1"
+      network: "lan"
+      mode: "ap"
+      ssid: "{{ wifi.radio1.ssid }}"
+      encryption: "{{ wifi.radio1.encryption }}"
+      key: "{{ wifi.radio1.key }}"
+      isolate: "0"
+      wmm: "1"
+      ieee80211w: "1"
+  notify: reload wireless

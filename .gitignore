@@ -1,0 +1,35 @@
+# Python virtual environment
+venv/
+.env
+
+# Ansible
+*.retry
+__pycache__/
+*.pyc
+
+# Secrets and sensitive files
+secrets/
+*.vault
+vault-password.txt
+*.key
+*.pem
+!secrets/README.md
+
+# Backups (keep local, don't commit)
+backups/
+!backups/README.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs
+*.log

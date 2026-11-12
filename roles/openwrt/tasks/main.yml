@@ -1,0 +1,37 @@
+---
+# OpenWrt role main tasks file
+- name: Include system tasks
+  include_tasks: system.yml
+  tags: [system, hostname, timezone]
+
+- name: Include network tasks
+  include_tasks: network.yml
+  tags: [network, lan, wan]
+
+- name: Include wireless tasks
+  include_tasks: wireless.yml
+  tags: [wifi, wireless]
+
+- name: Include DHCP tasks
+  include_tasks: dhcp.yml
+  tags: [dhcp, reservations]
+
+- name: Include DNS tasks
+  include_tasks: dns.yml
+  tags: [dns]
+
+- name: Include firewall tasks
+  include_tasks: firewall.yml
+  tags: [firewall, nat, zones]
+
+- name: Include SSH tasks
+  include_tasks: ssh.yml
+  tags: [ssh, security]
+
+- name: Include services tasks
+  include_tasks: services.yml
+  tags: [services, ntp, syslog]
+
+- name: Commit and apply changes
+  include_tasks: commit.yml
+  tags: [commit, apply]

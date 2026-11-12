@@ -1,0 +1,38 @@
+---
+# Global variables for all hosts
+timezone: "Asia/Kolkata"
+ntp_servers:
+  - "0.pool.ntp.org"
+  - "1.pool.ntp.org"
+  - "2.pool.ntp.org"
+
+# Network design (reusable across devices)
+network:
+  lan_subnet: "192.168.1.0/24"
+  lan_gateway: "192.168.1.1"
+  dns_servers:
+    - "1.1.1.1"
+    - "8.8.8.8"
+    - "9.9.9.9"
+
+# DHCP configuration
+dhcp:
+  enabled: true
+  start: 100
+  limit: 150
+  leasetime: "12h"
+
+# Firewall defaults
+firewall:
+  defaults:
+    input: "ACCEPT"
+    output: "ACCEPT"
+    forward: "REJECT"
+  synflood_protect: true
+
+# SSH hardening
+ssh:
+  permit_root_login: "prohibit-password"
+  password_authentication: false
+  pubkey_authentication: true
+  port: 22

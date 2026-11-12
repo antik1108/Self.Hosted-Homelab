@@ -1,0 +1,84 @@
+---
+# OpenWrt-specific variables (hardware-specific settings go here)
+router:
+  hostname: "main-router"
+  model: "TP-Link Archer C20 v5"
+  management_ip: "192.168.1.1"
+  management_interface: "br-lan"
+  wan_interface: "wan"
+  lan_interface: "lan"
+
+# Wireless configuration (device-specific radio names)
+wifi:
+  radio0:
+    disabled: false
+    country: "IN"
+    channel: "auto"
+    htmode: "HT40"
+    ssid: "HomeLab-2G"
+    encryption: "psk2+ccmp"
+    key: "{{ vault_wifi_2g_password }}"
+  radio1:
+    disabled: false
+    country: "IN"
+    channel: "auto"
+    htmode: "VHT80"
+    ssid: "HomeLab-5G"
+    encryption: "sae-mixed"
+    key: "{{ vault_wifi_5g_password }}"
+
+# LAN interface configuration
+lan:
+  type: "bridge"
+  proto: "static"
+  ipaddr: "{{ network.lan_gateway }}"
+  netmask: "255.255.255.0"
+  ip6assign: "60"
+
+# WAN interface configuration (adjust based on ISP)
+wan:
+  proto: "dhcp"
+  # For PPPoE:
+  # proto: "pppoe"
+  # username: "{{ vault_wan_username }}"
+  # password: "{{ vault_wan_password }}"
+
+# DHCP static reservations (MAC -> IP mapping)
+dhcp_static_reservations:
+  - name: "proxmox-host"
+    mac: "aa:bb:cc:dd:ee:ff"
+    ip: "192.168.1.10"
+  - name: "macbook"
+    mac: "11:22:33:44:55:66"
+    ip: "192.168.1.50"
+
+# DNS settings
+dns:
+  servers: "{{ network.dns_servers }}"
+  rebind_protection: true
+  localhost_only: false
+
+# Firewall zones
+firewall_zones:
+  - name: "lan"
+    input: "ACCEPT"
+    output: "ACCEPT"
+    forward: "ACCEPT"
+    network: "lan"
+  - name: "wan"
+    input: "REJECT"
+    output: "ACCEPT"
+    forward: "REJECT"
+    masq: true
+    mtu_fix: true
+    network: "wan"
+
+# Port forwards (example)
+# port_forwards:
+#   - name: "proxmox-web"
+#     src: "wan"
+#     src_dport: "8006"
+#     dest: "lan"
+#     dest_ip: "192.168.1.10"
+#     dest_port: "8006"
+#     proto: "tcp"

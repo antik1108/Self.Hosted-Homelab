@@ -1,0 +1,24 @@
+---
+- name: Create VM template configuration directory
+  ansible.builtin.file:
+    path: "/var/lib/vz/template/qemu"
+    state: directory
+    mode: "0755"
+
+- name: Document VM defaults
+  ansible.builtin.copy:
+    dest: "/root/vm-defaults.yml"
+    content: |
+      # VM Default Configuration
+      # Use these as reference for creating VMs
+      defaults:
+        memory: {{ vm_defaults.memory }}
+        cores: {{ vm_defaults.cores }}
+        cpu: "{{ vm_defaults.cpu }}"
+        net0: "{{ vm_defaults.net0 }}"
+        scsihw: "{{ vm_defaults.scsihw }}"
+        scsi0: "{{ vm_defaults.scsi0 }}"
+        ostype: "{{ vm_defaults.ostype }}"
+        onboot: {{ vm_defaults.onboot | lower }}
+        agent: "{{ vm_defaults.agent }}"
+  mode: "0644"
