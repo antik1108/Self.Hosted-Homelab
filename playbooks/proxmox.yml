@@ -10,7 +10,7 @@
     - name: Verify connectivity to Proxmox
       ansible.builtin.ping:
   roles:
-    - role: proxmox
+    - role: ../roles/proxmox
   tags:
     - proxmox
     - network

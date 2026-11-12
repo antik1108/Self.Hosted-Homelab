@@ -15,7 +15,7 @@
       delegate_to: localhost
 
     - name: Backup UCI configuration
-      openwrt.uci:
+      community.openwrt.uci:
         config: "{{ item }}"
         state: list
       register: uci_backup

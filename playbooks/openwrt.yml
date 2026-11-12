@@ -12,7 +12,7 @@
       ansible.builtin.ping:
       delegate_to: "{{ inventory_hostname }}"
   roles:
-    - role: openwrt
+    - role: ../roles/openwrt
   tags:
     - openwrt
     - network

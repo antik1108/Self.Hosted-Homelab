@@ -10,7 +10,7 @@
       delegate_to: "{{ inventory_hostname }}"
 
     - name: Verify LAN interface configuration
-      openwrt.uci:
+      community.openwrt.uci:
         config: network
         section: lan
         state: list
@@ -22,7 +22,7 @@
       delegate_to: localhost
 
     - name: Verify WAN interface configuration
-      openwrt.uci:
+      community.openwrt.uci:
         config: network
         section: wan
         state: list
@@ -34,7 +34,7 @@
       delegate_to: localhost
 
     - name: Verify DHCP configuration
-      openwrt.uci:
+      community.openwrt.uci:
         config: dhcp
         section: lan
         state: list
@@ -46,7 +46,7 @@
       delegate_to: localhost
 
     - name: Verify firewall zones
-      openwrt.uci:
+      community.openwrt.uci:
         config: firewall
         state: list
       register: firewall_config
@@ -57,7 +57,7 @@
       delegate_to: localhost
 
     - name: Verify wireless configuration
-      openwrt.uci:
+      community.openwrt.uci:
         config: wireless
         state: list
       register: wifi_config
